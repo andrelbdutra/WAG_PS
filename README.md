@@ -4,13 +4,13 @@ Este projeto tem como objetivo mensurar o desenpenho de cinco parceiros especifi
 
 ## Iniciando
 
-Estas instruções fornecerão uma cópia do projeto em sua máquina local e irão instruir-lhe a executar e manusear os dados gerados.
+Estas instruções fornecerão uma cópia do projeto em sua máquina local e o guiarão a executar e manusear os dados gerados.
 
-### Prerequisitos
+### Pré requisitos
 
-Você vai precisar Python3 e git instalados em sua máquina. 
+Você vai precisar de Python3 e git instalados em sua máquina. 
 
-Vá no terminal e rode os seguintes códigos para se certificar que já as possui.
+Vá no terminal e rode os seguintes códigos para se certificar que já os possui.
 
 ```
 git --version
