@@ -18,7 +18,6 @@ class Parceiro:
         self.somatorioVendasVouchers = 0
         self.vouchers = []
         self.vouchersSUM = {}
-        self.qntVendaPorLink = 0
         
     def imprime_geral_links(self):
         print("Parceiro(a): " + str(self.nome) + " | " + "Qnt_Por_Link: " + str(self.qntVendaPorLink) + " | " + "Valor_Por_Link: " + str("${:,.2f}".format(self.lucroVendaPorLink,2)))
@@ -27,7 +26,7 @@ class Parceiro:
     def imprime_rejected_links(self):
         print("Parceiro(a): " + str(self.nome) + " | " + "Qnt_Por_Link: " + str(self.qntVendaPorLinkRejected) + " | " + "Valor_Por_Link: " + "$" + str(round(self.lucroVendaPorLinkRejected,2)))
     def imprime_somatorio_Vendas_Vouchers(self):
-        print("Parceiro(a): " + str(self.nome) + " | " + "Vouchers: " + str(self.vouchers) + " | " + "Somatorio: " + str("${:,.2f}".format(sum(self.vouchersSUM.values()))))
+        print("Parceiro(a): " + str(self.nome) + " | " + "Vouchers: " + str(self.vouchers) + " | " + "Somatorio: " + str("${:,.2f}".format(self.somatorioVendasVouchers)))
     def imprime_somatorio_vendas_cada_voucher(self):
         for key, value in self.vouchersSUM.items():
             print("Parceiro(a): " + str(self.nome) + " | " + "Voucher: " + str(key) + " | " + "Somatorio: " + str("${:,.2f}".format(value)))
@@ -43,12 +42,17 @@ def ler_csv(nome_arquivo, num_atributos):
             objetos.append(novo_objeto)
     return objetos
 
+def gerar_csv(nome_arquivo, tuplas):
+    with open('outputData/'+nome_arquivo, 'w', newline='') as arquivo_csv:
+        escritor = csv.writer(arquivo_csv)
+        escritor.writerows(tuplas)
+
 # Lendo csv's
-nome_arquivo_transacoes = 'data/transacoes.csv'
+nome_arquivo_transacoes = 'inputData/transacoes.csv'
 num_atributos_transacoes = 6
-nome_arquivo_linkIds = 'data/linkIds.csv'
+nome_arquivo_linkIds = 'inputData/linkIds.csv'
 num_atributos_linkIds = 3
-nome_arquivo_voucherCodes = 'data/voucherCodes.csv'
+nome_arquivo_voucherCodes = 'inputData/voucherCodes.csv'
 num_atributos_voucherCodes = 2
 
 transacoes = ler_csv(nome_arquivo_transacoes, num_atributos_transacoes)
@@ -95,36 +99,70 @@ for transacao in transacoes:
             parceiro.qntVendaPorLinkRejected = parceiro.qntVendaPorLinkRejected + 1
             parceiro.lucroVendaPorLinkRejected = parceiro.lucroVendaPorLinkRejected + float(transacao.atributos[2])
 
-# impressão 1
+# inicializando segmentos e analizando seus valores
+segmentos = {}
+for parceiro in parceiros:
+    segmentos[parceiro.segmento] = 0
+for parceiro in parceiros:
+    segmentos[parceiro.segmento] = segmentos[parceiro.segmento] + parceiro.lucroVendaPorLink
+segmentosSorted = sorted(segmentos.items(), key=lambda x: x[1], reverse=True)
+
+
+# impressão questão 1, imprime no console e gera um arquivo csv
 def impressao_geral_links():
     print("\n" * 15)
-    print("__VENDAS_POR_PARCEIRO:__ ")
+    print("__VENDAS_POR_PARCEIRO (Decrescente):__ ")
+    parceiros.sort(key=lambda x: x.lucroVendaPorLink, reverse=True)
+    tuplasVPP = [('Parceiro(a)', 'Qnt_Por_Link', 'Valor_Por_Link')]
     for parceiro in parceiros:
+        tuplasVPP.append((parceiro.nome, parceiro.qntVendaPorLink, str("${:,.2f}".format(parceiro.lucroVendaPorLink))))
         parceiro.imprime_geral_links()
+    gerar_csv("VENDAS_POR_PARCEIRO", tuplasVPP)
 
-# impressao extras (não requisitadas, porém relevantes)
+# impressao extras (não requisitadas, porém relevantes), imprime no console e gera um arquivo csv
 def impressoes_extras():
     print("----------------------------------------------------------------")
-    print("__APPROVED_TRANSACTIONS:__ ")
+    print("__APPROVED_TRANSACTIONS (Decrescente):__ ")
+    parceiros.sort(key=lambda x: x.lucroVendaPorLinkApproved, reverse=True)
+    tuplasAT = [('Parceiro(a)', 'Qnt_Por_Link', 'Valor_Por_Link')]
     for parceiro in parceiros:
+        tuplasAT.append((parceiro.nome, parceiro.qntVendaPorLinkApproved, str("${:,.2f}".format(parceiro.lucroVendaPorLinkApproved))))
         parceiro.imprime_approved_links()
+    gerar_csv("APPROVED_TRANSACTIONS", tuplasAT)
     print("----------------------------------------------------------------")
-    print("__REJECTED_TRANSACTIONS:__ ")
+    print("__REJECTED_TRANSACTIONS (Decrescente):__ ")
+    parceiros.sort(key=lambda x: x.lucroVendaPorLinkRejected, reverse=True)
+    tuplasRT = [('Parceiro(a)', 'Qnt_Por_Link', 'Valor_Por_Link')]
     for parceiro in parceiros:
         parceiro.imprime_rejected_links()
-    print("----------------------------------------------------------------")
-    print("__VOUCHERS_TOTAL_SUM:__ ")
-    for parceiro in parceiros:
-        parceiro.imprime_somatorio_Vendas_Vouchers()
-
-# imprime o somatorio individual de vendas de cada voucher associado aos parceiros
-def impressao_vendas_cada_voucher():
+        tuplasRT.append((parceiro.nome, parceiro.qntVendaPorLinkApproved, str("${:,.2f}".format(parceiro.lucroVendaPorLinkApproved))))
+    gerar_csv("REJECTED_TRANSACTIONS", tuplasRT)
     print("----------------------------------------------------------------")
     print("__VOUCHERS_SUM:__ ")
     for parceiro in parceiros:
         parceiro.imprime_somatorio_vendas_cada_voucher()
+    print("----------------------------------------------------------------")
+    print("__VENDAS_POR_SEGMENTO (Decrescente):__ ")
+    tuplasVPS = [('Segmento', 'SUM')]
+    for i in segmentosSorted:
+        tuplasVPS.append((str(i[0]), str("${:,.2f}".format(i[1]))))
+        print("Segmento: " + str(i[0]) + " | " + "Valores: " + str("${:,.2f}".format(i[1])))
+    gerar_csv("VENDAS_POR_SEGMENTO", tuplasVPS)
 
+# imprime o somatorio individual de vendas de cada voucher associado aos parceiros, imprime no console e gera um arquivo csv
+def impressao_vendas_vouchers():
+    print("----------------------------------------------------------------")
+    print("__VOUCHERS_TOTAL_SUM (Decrescente):__ ")
+    tuplasVouchers = []
+    for parceiro in parceiros:
+        parceiro.somatorioVendasVouchers = sum(parceiro.vouchersSUM.values())
+    parceiros.sort(key=lambda x: x.somatorioVendasVouchers, reverse=True)
+    tuplasVouchers.append(("Parceiro(a)", "Vouchers", "SUM"))
+    for parceiro in parceiros:
+        tuplasVouchers.append((parceiro.nome, parceiro.vouchers, str("${:,.2f}".format((parceiro.somatorioVendasVouchers)))))
+        parceiro.imprime_somatorio_Vendas_Vouchers()
+    gerar_csv("VOUCHERS_TOTAL_SUM", tuplasVouchers)
 
 impressao_geral_links()
-impressao_vendas_cada_voucher()
+impressao_vendas_vouchers()
 impressoes_extras()
