@@ -1,6 +1,6 @@
 # WAG_PS
 
-Este projeto tem como objetivo mensurar o desenpenho de cinco parceiros especificos, além de adquirir os dados de quanto cada parceiro vendeu nos seus respectivos links associados e quanto cada parceiro vendeu considerando o somatóreio dos seus cupons associados.
+Este projeto tem como objetivo mensurar o desenpenho de cinco parceiros especificos, além de adquirir os dados de quanto cada parceiro vendeu nos seus respectivos links associados e quanto cada parceiro vendeu considerando o somatório dos seus cupons associados.
 
 ## Iniciando
 
