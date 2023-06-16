@@ -44,11 +44,11 @@ def ler_csv(nome_arquivo, num_atributos):
     return objetos
 
 # Lendo csv's
-nome_arquivo_transacoes = 'transacoes.csv'
+nome_arquivo_transacoes = 'data/transacoes.csv'
 num_atributos_transacoes = 6
-nome_arquivo_linkIds = 'linkIds.csv'
+nome_arquivo_linkIds = 'data/linkIds.csv'
 num_atributos_linkIds = 3
-nome_arquivo_voucherCodes = 'voucherCodes.csv'
+nome_arquivo_voucherCodes = 'data/voucherCodes.csv'
 num_atributos_voucherCodes = 2
 
 transacoes = ler_csv(nome_arquivo_transacoes, num_atributos_transacoes)
